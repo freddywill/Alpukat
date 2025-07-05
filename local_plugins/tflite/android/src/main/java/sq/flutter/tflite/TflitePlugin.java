@@ -409,6 +409,15 @@ public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
 
 
   private List<Map<String, Object>> GetTopN(int numResults, float threshold) {
+    if (labels == null) {
+      Log.e("TFLITE_PLUGIN", "GetTopN called but labels is null");
+      return new ArrayList<>();
+    }
+    if (labelProb == null || labelProb.length == 0 || labelProb[0].length != labels.size()) {
+      Log.e("TFLITE_PLUGIN", "GetTopN called but labelProb is null or size mismatch");
+      return new ArrayList<>();
+    }
+
     PriorityQueue<Map<String, Object>> pq =
         new PriorityQueue<>(
             1,

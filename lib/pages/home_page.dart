@@ -127,8 +127,17 @@ class _HomePageState extends State<HomePage> {
         _result = label;
       });
 
-      // Simpan ke Firebase
-      await ApiService.saveDetectionResult(image, label, confidence);
+      // Simpan ke Firebase dengan error handling dan feedback UI
+      try {
+        await ApiService.saveDetectionResult(image, label.trim(), confidence);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Gagal menyimpan hasil deteksi: \$e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else {
       setState(() {
         _result = "Tidak terdeteksi";

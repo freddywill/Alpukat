@@ -73,30 +73,47 @@ class _HistoryPageState extends State<HistoryPage> {
             itemCount: history.length,
             itemBuilder: (context, index) {
               final item = history[index];
-              final confidence = item['confidence'];
-              final confidenceStr = confidence != null
-                  ? "${(confidence * 100).toStringAsFixed(2)}%"
-                  : "N/A";
+          final confidence = item['confidence'];
+          final confidenceStr = confidence != null
+              ? "${(confidence * 100).toStringAsFixed(2)}%"
+              : "N/A";
 
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                child: ListTile(
-                  leading: Image.network(
-                    item['image_url'] ?? '',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image, size: 50),
-                  ),
-                  title: Text(item['label'] ?? "Tidak diketahui"),
-                  subtitle: Text("Confidence: $confidenceStr"),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _confirmAndDelete(item['image_url']),
-                  ),
-                ),
-              );
+          final timestamp = item['timestamp'];
+          String formattedTime = "";
+          if (timestamp != null) {
+            try {
+              final dateTime = (timestamp as dynamic).toDate();
+              formattedTime = "${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}";
+            } catch (e) {
+              formattedTime = "";
+            }
+          }
+
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: ListTile(
+              leading: Image.network(
+                item['image_url'] ?? '',
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image, size: 50),
+              ),
+              title: Text(item['label']?.toString().isNotEmpty == true ? item['label'] : "Tidak diketahui"),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Confidence: $confidenceStr"),
+                  if (formattedTime.isNotEmpty) Text("Waktu: $formattedTime", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () => _confirmAndDelete(item['image_url']),
+              ),
+            ),
+          );
             },
           );
         },
